@@ -12,6 +12,8 @@ config.json
 
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
 
+The inputs array describes the list of services to appear in homekit for each receiver.
+
 Example:
 
   ```json
@@ -27,11 +29,29 @@ Example:
     "platforms": [
         {
             "platform": "YamahaAVR",
-            "play_volume": -48,
-            "setMainInputTo": "Airplay",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
-            }
+            },
+            "inputs": [
+                {
+                "play_volume": -56,
+                "setInputTo": "Spotify",
+                "zone": "Main_Zone",
+                "display_name": "Spotify"
+                },
+                {
+                "play_volume": -30,
+                "setSceneTo": "0",
+                "zone": "Main_Zone",
+                "display_name": "Movie"
+                },
+                {
+                "play_volume": -45,
+                "setInputTo": "Spotify",
+                "zone": "Zone_2",
+                "display_name": "Outside music"
+                }
+            ]
         }
     ],
     "accessories": [
