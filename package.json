@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neonightmare/homebridge-yamaha.git"
+    "url": "git+https://github.com/callumsmits/homebridge-yamaha.git"
   },
   "preferGlobal": true,
   "keywords": [
@@ -30,10 +30,10 @@
     "util": "^0.10.x",
     "yamaha-nodejs": "^0.7.8"
   },
-  "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
+  "author": "Callum Smits (https://github.com/callumsmits)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/neonightmare/homebridge-yamaha/issues"
+    "url": "https://github.com/callumsmits/homebridge-yamaha/issues"
   },
-  "homepage": "https://github.com/neonightmare/homebridge-yamaha#readme"
+  "homepage": "https://github.com/callumsmits/homebridge-yamaha#readme"
 }
