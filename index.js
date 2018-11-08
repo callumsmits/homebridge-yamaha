@@ -93,7 +93,8 @@ function YamahaAVRPlatform(log, config) {
   this.expectedDevices = config["expected_devices"] || 100;
   this.discoveryTimeout = config["discovery_timeout"] || 30;
   this.manualAddresses = config["manual_addresses"] || {};
-  this.browser = mdns.createBrowser(mdns.tcp("http"), {
+  this.disableDiscovery = config["disable_discovery"] || false;
+  this.browser = !this.disableDiscovery && mdns.createBrowser(mdns.tcp("http"), {
     resolverSequence: sequence
   });
 }
@@ -155,8 +156,10 @@ YamahaAVRPlatform.prototype = {
     var that = this;
 
     var browser = this.browser;
-    browser.stop();
-    browser.removeAllListeners("serviceUp"); // cleanup listeners
+    if (!this.disableDiscovery) {
+      browser.stop();
+      browser.removeAllListeners("serviceUp"); // cleanup listeners  
+    }
     var accessories = [];
     var timer,
       timeElapsed = 0,
@@ -221,35 +224,39 @@ YamahaAVRPlatform.prototype = {
       });
     }
 
-    browser.on("serviceUp", setupFromService);
-    browser.start();
+    if (this.disableDiscovery) {
+      setTimeout(() => callback(accessories), 5000);
+    } else {
+      browser.on("serviceUp", setupFromService);
+      browser.start();
 
-    // The callback can only be called once...so we'll have to find as many as we can
-    // in a fixed time and then call them in.
-    var timeoutFunction = function() {
-      if (accessories.length >= that.expectedDevices) {
-        clearTimeout(timer);
-      } else {
-        timeElapsed += checkCyclePeriod;
-        if (timeElapsed > that.discoveryTimeout * 1000) {
-          that.log(
-            "Waited " + that.discoveryTimeout + " seconds, stopping discovery."
-          );
+      // The callback can only be called once...so we'll have to find as many as we can
+      // in a fixed time and then call them in.
+      var timeoutFunction = function() {
+        if (accessories.length >= that.expectedDevices) {
+          clearTimeout(timer);
         } else {
-          timer = setTimeout(timeoutFunction, checkCyclePeriod);
-          return;
+          timeElapsed += checkCyclePeriod;
+          if (timeElapsed > that.discoveryTimeout * 1000) {
+            that.log(
+              "Waited " + that.discoveryTimeout + " seconds, stopping discovery."
+            );
+          } else {
+            timer = setTimeout(timeoutFunction, checkCyclePeriod);
+            return;
+          }
         }
-      }
-      browser.stop();
-      browser.removeAllListeners("serviceUp");
-      that.log(
-        "Discovery finished, found " +
-          accessories.length +
-          " Yamaha AVR devices."
-      );
-      callback(accessories);
-    };
-    timer = setTimeout(timeoutFunction, checkCyclePeriod);
+        browser.stop();
+        browser.removeAllListeners("serviceUp");
+        that.log(
+          "Discovery finished, found " +
+            accessories.length +
+            " Yamaha AVR devices."
+        );
+        callback(accessories);
+      };
+      timer = setTimeout(timeoutFunction, checkCyclePeriod);
+    }
   }
 };
 
